@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  ts-express-app:
+    container_name: 5e-graphql-prod
+    build:
+      context: .
+      target: production
+    image: 5e-graphql-prod
+    ports:
+      - 3000:3000
+    command: yarn start

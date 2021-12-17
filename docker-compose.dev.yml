@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  ts-express-app:
+    container_name: dw-graphql-dev
+    build:
+      context: .
+      target: base
+    image: dw-graphql-dev
+    expose:
+      - "9229"
+    ports:
+      - 3000:3000
+      - 9229:9229
+    volumes:
+      - ./src:/src
+    command: yarn dev
+
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=dev
+    volumes:
+      - /data:/var/lib/postgresql/data
+  
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
