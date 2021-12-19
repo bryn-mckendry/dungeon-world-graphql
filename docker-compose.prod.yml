@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  ts-express-app:
+  app:
     container_name: 5e-graphql-prod
     build:
       context: .

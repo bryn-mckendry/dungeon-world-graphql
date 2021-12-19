@@ -134,44 +134,6 @@ export const getMonsterByName = async (name: string) => {
   }
 }
 
-export const getMonsterActionsByMonsterId = async (id: number) => {
-  try {
-    const res = await db.query(`
-      SELECT
-        ma.id,
-        ma.name
-      FROM monster_actions as ma
-
-      WHERE
-        ma.monster_id = $1
-    `, [id]);
-    return res.rows;
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-
-export const getMonsterAttackTagsByMonsterId = async (id: number) => {
-  try {
-    const res = await db.query(`
-      SELECT
-        mt.id,
-        mt.name
-      FROM monster_attack_tags AS mt
-
-      INNER JOIN monsters_monster_attack_tags AS mmat
-        ON mmat.monster_attack_tag_id = mt.id
-
-      WHERE
-        mmat.monster_id = $1
-    `, [id]);
-    return res.rows;
-  } catch (e) {
-    console.log(e);
-  }
-}
-
 export const getMonstersByMonsterAttackTagId = async (id: number) => {
   try {
     const res = await db.query(`
@@ -184,27 +146,6 @@ export const getMonstersByMonsterAttackTagId = async (id: number) => {
 
       WHERE
         mmat.monster_attack_tag_id = $1
-    `, [id]);
-    return res.rows;
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-
-export const getMonsterQualitiesByMonsterId = async (id: number) => {
-  try {
-    const res = await db.query(`
-      SELECT
-        q.id,
-        q.name
-      FROM monster_qualities AS q
-
-      INNER JOIN monsters_monster_qualities AS mmq
-        ON mmq.monster_quality_id = q.id
-
-      WHERE
-        mmq.monster_id = $1
     `, [id]);
     return res.rows;
   } catch (e) {
@@ -225,26 +166,6 @@ export const getMonstersByMonsterQualityId = async (id: number) => {
       WHERE
         mmq.monster_quality_id = $1
     `, [id]);
-    return res.rows;
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-
-export const getMonsterTagsByMonsterId = async (id: number) => {
-  try {
-    const res = await db.query(`
-      SELECT
-        mt.*
-      FROM monster_tags AS mt
-
-      INNER JOIN monsters_monster_tags AS mmt
-        ON mmt.monster_tag_id = mt.id
-      
-      WHERE
-        mmt.monster_id = $1
-    `, [id])
     return res.rows;
   } catch (e) {
     console.log(e);
@@ -273,12 +194,3 @@ export const getMonstersByMonsterTagId = async (id: number) => {
   }
 }
 
-
-export const getMonsterTags = async () => {
-  try {
-    const res = await db.query('SELECT * FROM monster_tags');
-    return res.rows;
-  } catch (e) {
-    console.log(e);
-  }
-}

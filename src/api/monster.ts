@@ -5,15 +5,19 @@ import {
   GraphQLNonNull,
   GraphQLList
 } from 'graphql';
+import { getMonsterAttackTagsByMonsterId } from '../database/monsterAttackTags';
 import {
-  getMonsterActionsByMonsterId,
-  getMonsterAttackTagsByMonsterId,
-  getMonsterQualitiesByMonsterId,
   getMonstersByMonsterAttackTagId,
   getMonstersByMonsterQualityId,
-  getMonstersByMonsterTagId,
-  getMonsterTagsByMonsterId
+  getMonstersByMonsterTagId
 } from '../database/monster';
+import { getMonsterActionsByMonsterId } from '../database/monsterActions';
+import { getMonsterQualitiesByMonsterId } from '../database/monsterQualities';
+import {
+  getSettingById,
+  getMonstersBySettingId
+} from '../database/monsterSetting';
+import { getMonsterTagsByMonsterId } from '../database/monsterTag';
 
 export const MonsterType: GraphQLObjectType = new GraphQLObjectType({
   name: 'MonsterType',
@@ -70,6 +74,15 @@ export const MonsterType: GraphQLObjectType = new GraphQLObjectType({
       type: new GraphQLList(MonsterActionType),
       description: 'actions that the monster can take.',
       resolve: async parent => await getMonsterActionsByMonsterId(parent.id)
+    },
+    setting_id: {
+      type: GraphQLInt,
+      description: 'id of the monster\'s setting.'
+    },
+    setting: {
+      type: MonsterSettingType,
+      description: 'the monster\'s setting.',
+      resolve: async parent => await getSettingById(parent.id)
     }
   })
 });
@@ -86,6 +99,10 @@ export const MonsterTagType: GraphQLObjectType = new GraphQLObjectType({
     name: {
       type: new GraphQLNonNull(GraphQLString),
       description: 'the tag itself.'
+    },
+    description: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'the description of the tag.'
     },
     monsters: {
       type: new GraphQLList(MonsterType),
@@ -127,6 +144,10 @@ export const MonsterAttackTagType: GraphQLObjectType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLString),
       description: 'the attack tag'
     },
+    description: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'the description of the attack tag.'
+    },
     monsters: {
       type: new GraphQLList(MonsterType),
       description: 'list of monsters that share this attack tag.',
@@ -150,6 +171,30 @@ export const MonsterActionType: GraphQLObjectType = new GraphQLObjectType({
     monster_id: {
       type: new GraphQLNonNull(GraphQLInt),
       description: 'the id of the monster this action is for.'
+    }
+  })
+});
+
+export const MonsterSettingType: GraphQLObjectType = new GraphQLObjectType({
+  name: 'MonsterSettingType',
+  description: 'settings for monsters.',
+  fields: () => ({
+    id: {
+      type: new GraphQLNonNull(GraphQLInt),
+      description: 'id of the setting.'
+    },
+    name: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'name of the setting.'
+    },
+    description: {
+      type: GraphQLString,
+      description: 'description of the setting.'
+    },
+    monsters: {
+      type: new GraphQLList(MonsterType),
+      description: 'monsters under this setting.',
+      resolve: async parent => await getMonstersBySettingId(parent.id) 
     }
   })
 });

@@ -7,21 +7,41 @@ import {
   GraphQLString,
   GraphQLNonNull
 } from 'graphql';
-
-import { MonsterType, MonsterTagType } from './monster';
+import {
+  MonsterType,
+  MonsterTagType,
+  MonsterQualityType,
+  MonsterAttackTagType,
+  MonsterSettingType
+} from './monster';
 import {
   getMonsters,
-  getMonsterTags, 
   getMonsterByName,
   addMonster,
-  removeMonster
+  removeMonster,
  } from '../database/monster';
+import { getSettingById, getSettings } from '../database/monsterSetting';
+import { getMonsterTagById, getMonsterTags } from '../database/monsterTag';
+import { getMonsterAttackTagById, getMonsterAttackTags } from '../database/monsterAttackTags';
 
 
 const RootQueryType = new GraphQLObjectType({
   name: 'Query',
   description: 'The root query.',
   fields: () => ({
+    setting: {
+      type: MonsterSettingType,
+      description: 'A specific monster setting.',
+      args: {
+        id: { type: GraphQLInt }
+      },
+      resolve: async (_, { id }) => await getSettingById(id)
+    },
+    settings: {
+      type: new GraphQLList(MonsterSettingType),
+      description: 'List of all monster settings.',
+      resolve: async () => await getSettings()
+    },
     monster: {
       type: MonsterType,
       description: 'A specific monster.',
@@ -36,10 +56,33 @@ const RootQueryType = new GraphQLObjectType({
       description: 'List of all monsters.',
       resolve: async () => await getMonsters()
     },
+    monsterTag: {
+      type: MonsterTagType,
+      description: 'A specific monster tag.',
+      resolve: async (_, { id }) => await getMonsterTagById(id)
+    },
     monsterTags: {
       type: new GraphQLList(MonsterTagType),
       description: 'List of all monster tags.',
       resolve: async () => await getMonsterTags()
+    },
+    monsterQualities: {
+      type: new GraphQLList(MonsterQualityType),
+      description: 'List of all monster qualities.',
+      resolve: async () => await getMonsters()
+    },
+    monsterAttackTag: {
+      type: MonsterAttackTagType,
+      description: 'A specific monster attack tag.',
+      args: {
+        id: { type: GraphQLInt }
+      },
+      resolve: async (_, { id }) => await getMonsterAttackTagById(id)
+    },
+    monsterAttackTags: {
+      type: new GraphQLList(MonsterAttackTagType),
+      description: 'List of all monster attack tags.',
+      resolve: async () => await getMonsterAttackTags()
     }
   })
 });
