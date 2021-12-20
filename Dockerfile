@@ -8,6 +8,7 @@ ENV PGHOST=db
 ENV PGPASSWORD=password
 ENV PGPORT=5432
 ENV PGDATABASE=dev
+ENV TOKEN_SECRET=secret-dev
 
 COPY ["package.json", "yarn.lock", "./"]
 

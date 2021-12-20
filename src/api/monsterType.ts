@@ -20,7 +20,7 @@ import {
 import { getMonsterTagsByMonsterId } from '../database/monsterTag';
 
 export const MonsterType: GraphQLObjectType = new GraphQLObjectType({
-  name: 'MonsterType',
+  name: 'Monster',
   description: 'Type for monsters.',
   fields: () => ({
     id: {
@@ -84,12 +84,13 @@ export const MonsterType: GraphQLObjectType = new GraphQLObjectType({
       description: 'the monster\'s setting.',
       resolve: async parent => await getSettingById(parent.id)
     }
-  })
+  }),
+  isTypeOf: val => val.name && val.id
 });
 
 
 export const MonsterTagType: GraphQLObjectType = new GraphQLObjectType({
-  name: 'MonsterTagType',
+  name: 'MonsterTag',
   description: 'Tags for monsters.',
   fields: () => ({
     id: {
@@ -113,7 +114,7 @@ export const MonsterTagType: GraphQLObjectType = new GraphQLObjectType({
 });
 
 export const MonsterQualityType: GraphQLObjectType = new GraphQLObjectType({
-  name: 'MonsterQualityType',
+  name: 'MonsterQuality',
   description: 'Qualities for monsters.',
   fields: () => ({
     id: {
@@ -133,7 +134,7 @@ export const MonsterQualityType: GraphQLObjectType = new GraphQLObjectType({
 });
 
 export const MonsterAttackTagType: GraphQLObjectType = new GraphQLObjectType({
-  name: 'MonsterAttackTagType',
+  name: 'MonsterAttackTag',
   description: 'attack tag for monsters.',
   fields: () => ({
     id: {
@@ -157,7 +158,7 @@ export const MonsterAttackTagType: GraphQLObjectType = new GraphQLObjectType({
 });
 
 export const MonsterActionType: GraphQLObjectType = new GraphQLObjectType({
-  name: 'MonsterActionType',
+  name: 'MonsterAction',
   description: 'action of a monster.',
   fields: () => ({
     id: {
@@ -176,7 +177,7 @@ export const MonsterActionType: GraphQLObjectType = new GraphQLObjectType({
 });
 
 export const MonsterSettingType: GraphQLObjectType = new GraphQLObjectType({
-  name: 'MonsterSettingType',
+  name: 'MonsterSetting',
   description: 'settings for monsters.',
   fields: () => ({
     id: {

@@ -1,4 +1,10 @@
 
+CREATE TABLE IF NOT EXISTS admins (
+  id            SERIAL PRIMARY KEY NOT NULL,
+  username      VARCHAR(50) UNIQUE NOT NULL,
+  password_hash  VARCHAR(300) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS monster_settings (
   id          SERIAL PRIMARY KEY NOT NULL,
   name        VARCHAR(100) UNIQUE NOT NULL,
@@ -37,8 +43,9 @@ CREATE TABLE IF NOT EXISTS monster_attack_tags (
 );
 
 CREATE TABLE IF NOT EXISTS monster_qualities (
-  id    SERIAL PRIMARY KEY NOT NULL,
-  name  VARCHAR(100) UNIQUE NOT NULL
+  id          SERIAL PRIMARY KEY NOT NULL,
+  name        VARCHAR(100) NOT NULL,
+  monster_id  INT NOT NULL REFERENCES monsters ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS monsters_monster_tags (
@@ -51,10 +58,4 @@ CREATE TABLE IF NOT EXISTS monsters_monster_attack_tags (
   monster_id            INT NOT NULL REFERENCES monsters ON UPDATE CASCADE ON DELETE CASCADE,
   monster_attack_tag_id INT NOT NULL REFERENCES monster_attack_tags ON UPDATE CASCADE ON DELETE CASCADE,
   PRIMARY KEY (monster_id, monster_attack_tag_id)
-);
-
-CREATE TABLE IF NOT EXISTS monsters_monster_qualities (
-  monster_id          INT NOT NULL REFERENCES monsters ON UPDATE CASCADE ON DELETE CASCADE,
-  monster_quality_id  INT NOT NULL REFERENCES monster_qualities ON UPDATE CASCADE ON DELETE CASCADE,
-  PRIMARY KEY(monster_id, monster_quality_id)
 );

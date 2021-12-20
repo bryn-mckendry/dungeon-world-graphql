@@ -70,19 +70,7 @@ export const addMonster = async (monster: {
 
     if (monster.qualities) {
       for (let quality of monster.qualities) {
-        let cleanQuality: string = quality.toLowerCase().trim();
-        let res = await db.query(`SELECT * FROM monster_qualities WHERE LOWER(name) = $1`, [cleanQuality]);
-        let qualityId: number;
-        if (res.rowCount === 0) {
-          let res = await db.query('INSERT INTO monster_qualities (name) VALUES ($1) RETURNING *', [quality]);
-          qualityId = +res.rows[0].id;
-        } else {
-          qualityId = +res.rows[0].id;
-        }
-        await db.query(
-          'INSERT INTO monsters_monster_qualities (monster_id, monster_quality_id) VALUES ($1, $2)',
-          [id, qualityId]
-        );
+          await db.query('INSERT INTO monster_qualities (name) VALUES ($1) RETURNING *', [quality]);
       }
     }
 
@@ -102,6 +90,52 @@ export const removeMonster = async (id: number) => {
   try {
     const res = await db.query('DELETE FROM monsters WHERE id = $1 RETURNING *', [id]);
     return res.rows[0];
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export const updateMonster = async (monster: {
+  id: number,
+  name?: string,
+  tags?: string[],
+  attack?: string,
+  damage?: string,
+  hp?: number,
+  armor?: number,
+  attackTags?: string[],
+  qualities?: string[],
+  description?: string,
+  instinct?: string,
+  actions?: string[]
+}) => {
+  try {
+    let res = await db.query (`
+      UPDATE monsters SET
+        name = COALESCE($1, name),
+        attack = COALESCE($2, attack),
+        damage = COALESCE($3, damage),
+        hp = COALESCE($4, hp),
+        armor = COALESCE($5, armor),
+        description = COALESCE($6, description),
+        instinct = COALESCE($7, instinct)
+      WHERE id = $8
+      RETURNING *;
+    `, [
+      monster.name,
+      monster.attack,
+      monster.damage,
+      monster.hp,
+      monster.armor,
+      monster.description,
+      monster.instinct,
+      monster.id
+    ]);
+    let updatedMonster = res.rows[0];
+
+    // TODO: implement reference updates.
+
+    return updatedMonster;
   } catch (e) {
     console.log(e);
   }
