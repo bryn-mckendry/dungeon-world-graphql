@@ -25,9 +25,3 @@ export const validateToken = async (token: string) => {
     return false;
   }
 }
-
-export const addAdmin = async (username: string, password: string): Promise<boolean> => {
-  const hash = await bcrypt.hash(password, 10);
-  const success = await insertAdmin(username, hash);
-  return success ? true : false
-}

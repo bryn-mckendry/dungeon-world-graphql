@@ -27,7 +27,7 @@ import { getMonsterAttackTagById, getMonsterAttackTags } from '../database/monst
 import { UnauthorizedAccessType } from './errorType';
 import { MonsterMutationResultType } from './resultTypes';
 import { AuthResponseType } from './authType';
-import { login, addAdmin, validateToken } from '../auth';
+import { login, validateToken } from '../auth';
 
 
 const RootQueryType = new GraphQLObjectType({
@@ -158,15 +158,6 @@ const RootMutationType = new GraphQLObjectType({
         }
         return UnauthorizedAccessType;
       }
-    },
-    addAdmin: {
-      type: GraphQLBoolean,
-      description: 'DEV ONLY add admin',
-      args: {
-        username: { type: new GraphQLNonNull(GraphQLString) },
-        password: { type: new GraphQLNonNull(GraphQLString) }
-      },
-      resolve: async (_, { username, password }) => await addAdmin(username, password)
     }
   })
 });

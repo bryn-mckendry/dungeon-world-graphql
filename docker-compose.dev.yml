@@ -5,7 +5,7 @@ services:
     container_name: dw-graphql-dev
     build:
       context: .
-      target: base
+      target: development
     image: dw-graphql-dev
     expose:
       - "9229"
@@ -14,11 +14,11 @@ services:
       - 9229:9229
     volumes:
       - ./src:/src
-    command: yarn dev
+    command: sh -c "sleep 3 && node scripts/addAdmin.js && yarn dev"
 
   db:
     image: postgres
-    container_name: dw-db
+    container_name: dw-db-dev
     restart: always
     ports:
       - 5432:5432
@@ -32,6 +32,7 @@ services:
   
   adminer:
     image: adminer
+    container_name: dw-adminer-dev
     restart: always
     ports:
       - 8080:8080
