@@ -10,6 +10,15 @@ RUN yarn install
 
 COPY . .
 
+FROM base as test
+
+ENV PGUSER=postgres
+ENV PGHOST=db
+ENV PGPASSWORD=password
+ENV PGPORT=5432
+ENV PGDATABASE=test
+ENV TOKEN_SECRET=secret-test
+
 FROM base as development
 
 ENV PGUSER=postgres

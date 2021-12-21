@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  app:
+    container_name: dw-graphql-test
+    build:
+      context: .
+      target: test
+    image: dw-graphql-test
+    ports:
+      - 3000:3000
+    volumes:
+      - ./src:/src
+    command: sh -c "sleep 3 && yarn test"
+
+  db:
+    image: postgres
+    container_name: dw-db-test
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=test
+    volumes:
+      - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./sql/insert_data.sql:/docker-entrypoint-initdb.d/insert_data.sql

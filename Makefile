@@ -11,4 +11,4 @@ prod-down:
 	sudo docker-compose -f docker-compose.prod.yml down
 
 run-tests:
-	sudo docker-compose -f docker-compose.dev.yml run ts-express-app yarn jest
+	sudo docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build && sudo docker-compose -f docker-compose.test.yml down -v
