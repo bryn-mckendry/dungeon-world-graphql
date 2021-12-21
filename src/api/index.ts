@@ -116,7 +116,7 @@ const RootMutationType = new GraphQLObjectType({
         actions: { type: new GraphQLList(GraphQLString) }
       },
       resolve: async (_, args, context) => { 
-        if ( await validateToken(context.headers.token)) {
+        if (await validateToken(context.headers.token)) {
           return await addMonster(args);
         }
         return UnauthorizedAccessType;

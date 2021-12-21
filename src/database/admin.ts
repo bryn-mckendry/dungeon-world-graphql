@@ -11,15 +11,3 @@ export const getPasswordByUsername = async (username: string) => {
     console.log(e);
   }
 }
-
-export const insertAdmin = async (username: string, passwordHash: string) => {
-  try {
-    const res = await db.query(
-      'INSERT INTO admins (username, password_hash) VALUES ($1, $2) RETURNING username',
-      [username, passwordHash]
-    )
-    return res.rows[0];
-  } catch (e) {
-    console.log(e);
-  }
-}

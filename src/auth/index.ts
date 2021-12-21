@@ -1,18 +1,19 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { getPasswordByUsername, insertAdmin } from '../database/admin';
+import { getPasswordByUsername } from '../database/admin';
 
 
-export const login = async (username: string, password: string): Promise<{ token: string } | undefined> => {
+export const login = async (username: string, password: string): Promise<{ token: string | null }> => {
   try {
     const hash = await getPasswordByUsername(username);
     const match = await bcrypt.compare(password, hash);
     if (!match) {
-      return;
+      return { token: null };
     }
     return { token: jwt.sign({ username }, process.env.TOKEN_SECRET!, { expiresIn: '1h' }) };
   } catch (e) {
     console.log(e);
+    return { token: null };
   }
 }
 

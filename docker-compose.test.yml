@@ -11,7 +11,7 @@ services:
       - 3000:3000
     volumes:
       - ./src:/src
-    command: sh -c "sleep 3 && yarn test"
+    command: sh -c "sleep 3 && node scripts/addAdmin.js && yarn test"
 
   db:
     image: postgres
