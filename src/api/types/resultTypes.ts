@@ -1,17 +1,13 @@
-import { GraphQLObjectType, GraphQLUnionType } from 'graphql';
-import { BadRequestType, UnauthorizedAccessType } from './errorType';
+import { GraphQLUnionType } from 'graphql';
+import { ApiErrorType } from './errorType';
 import { MonsterType } from './monsterType';
 
 export const MonsterMutationResultType: GraphQLUnionType = new GraphQLUnionType({
   name: 'MonsterMutationResult',
   description: 'Resulting data from mutating Monster resources.',
-  types: [UnauthorizedAccessType, MonsterType, BadRequestType],
+  types: [ApiErrorType, MonsterType],
   resolveType: val => {
     if (val.name && val.id) return 'Monster';
-    else if (val instanceof GraphQLObjectType && val.name === 'UnauthorizedAccess') return 'UnauthorizedAccess'
-    else return 'BadRequest'
+    else return 'ApiError'
   }
-  
-  
-  // resolveType: val => val.name && val.id ? 'Monster' : 'UnauthorizedAccess'
 });

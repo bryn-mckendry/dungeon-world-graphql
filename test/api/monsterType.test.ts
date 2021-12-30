@@ -4,6 +4,9 @@ import { mockToken } from '../utils';
 
 
 describe('Monsters API', () => {
+
+  /* ------------------------------ GET TESTS ------------------------------ */
+
   test('monsters should return list of all monsters.', async () => {
     const res = await request(app)
       .post('/graphql')
@@ -39,13 +42,26 @@ describe('Monsters API', () => {
     expect(monster.name).toBe('Ankheg');
   });
 
+
+  /* ------------------------------ DELETE TESTS ------------------------------ */
+
   test('removeMonster mutation should remove the monster from the database.', async () => {
     const { token } = mockToken();
     const res = await request(app)
       .post('/graphql')
       .set({ token })
       .send({
-        query: 'mutation { removeMonster(id: 1) { __typename ... on UnauthorizedAccess { message } ... on Monster { id, name } } }'
+        query: `
+          mutation {
+            removeMonster(id: 1) {
+              __typename
+              ... on Monster {
+                id,
+                name
+              }
+            }
+          }
+        `
       });
     expect(res.body.data.message).toBeUndefined();
     let removeMonster = res.body.data.removeMonster;
@@ -66,17 +82,52 @@ describe('Monsters API', () => {
       .post('/graphql')
       .set({ token: 'bad-token' })
       .send({
-        query: 'mutation { removeMonster(id: 2) { __typename ... on UnauthorizedAccess { status, message } ... on Monster { id } } }'
-      });
-    console.log(res.body);
+        query: `
+          mutation {
+            removeMonster(id: 2) {
+              __typename
+              ... on ApiError {
+                status,
+                message
+              }
+            }
+          }
+        `});
     expect(res.body.data.removeMonster.message).toBe('Unauthorized access.');
     expect(res.body.data.removeMonster.status).toBe(401);
 
+    const token = mockToken();
     const check = await request(app)
       .post('/graphql')
+      .set({ token })
       .send({ query: '{ monster(id: 2) { name } }' })
     expect(check.body.data.monster).toHaveProperty('name');
   });
+
+  test('removeMonster mutation should return a bad request message if monster does not exist.', async () => {
+    const { token } = mockToken();
+    const res = await request(app)
+      .post('/graphql')
+      .set({ token })
+      .send({
+        query: `
+          mutation {
+            removeMonster(id: 1) {
+              __typename
+              ... on ApiError {
+                status,
+                message
+              }
+            }
+          }
+        `
+      });
+    expect(res.body.data.removeMonster.message).toBe('Monster with id \'1\' does not exist.');
+    expect(res.body.data.removeMonster.status).toBe(404);
+  });
+
+
+  /* ------------------------------ INSERT TESTS ------------------------------ */
 
   test('addMonster mutation should add a new monster to the database.', async () => {
     const { token } = mockToken();
@@ -97,6 +148,9 @@ describe('Monsters API', () => {
     expect(res.body).toHaveProperty('data');
     expect(res.body.data.addMonster?.name).toBe('Test');
   });
+
+
+  /* ------------------------------ UPDATE TESTS ------------------------------ */
 
   test('updateMonster mutation should update the monster data.', async () => {
     const { token } = mockToken();
@@ -147,7 +201,7 @@ describe('Monsters API', () => {
                   name
                 }
               }
-              ... on BadRequest {
+              ... on ApiError {
                 message
               }
             }
@@ -169,7 +223,7 @@ describe('Monsters API', () => {
       expect(data.setting).toEqual({ name: 'The Dark Woods'});
   });
 
-  test('updateMonster mutation with bad attack tag should not update the monster', async () => {
+  test('updateMonster mutation with bad tag should not update the monster.', async () => {
     const { token } = mockToken();
     const res = await request(app)
       .post('/graphql')
@@ -179,10 +233,38 @@ describe('Monsters API', () => {
           mutation {
             updateMonster(
               id: 1,
-              tags: ["Divine", "Bad Tag"]
+              tags: ["Large", "Bad Tag"]
             ) {
               __typename
-              ... on BadRequest {
+              ... on ApiError {
+                status,
+                message
+              }
+            }
+          }
+        `
+      });
+    expect(res.body).toHaveProperty('data');
+    expect(res.body.data).toHaveProperty('updateMonster');
+    expect(res.body.data.updateMonster).toHaveProperty('message')
+    expect(res.body.data.updateMonster.message).toBe(`Monster tag 'Bad Tag' does not exist.`)
+    expect(res.body.data.updateMonster.status).toBe(404);
+  });
+
+  test('updateMonster mutation with bad attack tag should not update the monster.', async () => {
+    const { token } = mockToken();
+    const res = await request(app)
+      .post('/graphql')
+      .set({ token })
+      .send({
+        query: `
+          mutation {
+            updateMonster(
+              id: 1,
+              attackTags: ["Near", "Bad Tag"]
+            ) {
+              __typename
+              ... on ApiError {
                 status,
                 message
               }
@@ -192,7 +274,34 @@ describe('Monsters API', () => {
     expect(res.body).toHaveProperty('data');
     expect(res.body.data).toHaveProperty('updateMonster');
     expect(res.body.data.updateMonster).toHaveProperty('message');
-    expect(res.body.data.updateMonster.message).toBe(`Monster tag 'Bad Tag' does not exist.`);
-    expect(res.body.data.updateMonster.status).toBe(400);
+    expect(res.body.data.updateMonster.message).toBe(`Monster attack tag 'Bad Tag' does not exist.`);
+    expect(res.body.data.updateMonster.status).toBe(404);
+  });
+
+  test('updateMonster mutation with bad setting should not update the monster.', async () => {
+    const { token } = mockToken();
+    const res = await request(app)
+      .post('/graphql')
+      .set({ token })
+      .send({
+        query: `
+          mutation {
+            updateMonster(
+              id: 1,
+              setting: "Bad Setting"
+            ) {
+              __typename
+              ... on ApiError {
+                status,
+                message
+              }
+            }
+          }
+        `})
+    expect(res.body).toHaveProperty('data');
+    expect(res.body.data).toHaveProperty('updateMonster');
+    expect(res.body.data.updateMonster).toHaveProperty('message');
+    expect(res.body.data.updateMonster.message).toBe(`Monster setting 'Bad Setting' does not exist.`);
+    expect(res.body.data.updateMonster.status).toBe(404);
   });
 });

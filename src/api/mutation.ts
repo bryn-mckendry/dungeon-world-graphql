@@ -12,10 +12,14 @@ import {
   updateMonster,
  } from '../database/monster';
 import {
-  UnauthorizedAccessType,
   MonsterMutationResultType
 } from './types';
 import { validateToken } from '../auth';
+
+
+const validateRequest = async (token: string, callback: Function) => {
+  return await validateToken(token) ? await callback() : { status: 401, message: 'Unauthorized access.' }
+}
 
 
 export const RootMutationType = new GraphQLObjectType({
@@ -38,12 +42,10 @@ export const RootMutationType = new GraphQLObjectType({
         instinct: { type: GraphQLString },
         actions: { type: new GraphQLList(GraphQLString) }
       },
-      resolve: async (_, args, context) => { 
-        if (await validateToken(context.headers.token)) {
-          return await addMonster(args);
-        }
-        return UnauthorizedAccessType;
-      }
+      resolve: async (_, args, context) => await validateRequest(
+        context.headers.token,
+        async () => await addMonster(args)
+      )
     },
     removeMonster: {
       type: MonsterMutationResultType,
@@ -51,12 +53,10 @@ export const RootMutationType = new GraphQLObjectType({
       args: { 
         id: { type: GraphQLInt }
       },
-      resolve: async (_, { id }, context) => {
-        if (await validateToken(context.headers.token)) {
-          return await removeMonster(id); 
-        }
-        return UnauthorizedAccessType;
-      }
+      resolve: async (_, { id }, context) => await validateRequest(
+        context.headers.token,
+        async () => await removeMonster(id)
+      )
     },
     updateMonster: {
       type: MonsterMutationResultType,
@@ -76,12 +76,10 @@ export const RootMutationType = new GraphQLObjectType({
         actions: { type: new GraphQLList(GraphQLString) },
         setting: { type: GraphQLString }
       },
-      resolve: async (_, args, context) => { 
-        if (await validateToken(context.headers.token)) {
-          return await updateMonster(args);
-        }
-        return UnauthorizedAccessType;
-      }
+      resolve: async (_, args, context) => await validateRequest(
+        context.headers.token,
+        async () => await updateMonster(args)
+      )
     }
   })
 });

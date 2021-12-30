@@ -1,5 +1,5 @@
 
-export { UnauthorizedAccessType } from './errorType';
+export { ApiErrorType } from './errorType';
 export { AuthResponseType } from './authType';
 export {
   MonsterType,
