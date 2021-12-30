@@ -22,3 +22,20 @@ export const UnauthorizedAccessType: GraphQLObjectType = new GraphQLObjectType({
     }
   })
 });
+
+
+export const BadRequestType: GraphQLObjectType = new GraphQLObjectType({
+  name: 'BadRequest',
+  description: 'Result of a bad request body.',
+  fields: () => ({
+    status: {
+      type: new GraphQLNonNull(GraphQLInt),
+      description: 'The HTTP status code.',
+      resolve: () => 400
+    },
+    message: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'The error message.'
+    }
+  })
+});

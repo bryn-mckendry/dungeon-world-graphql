@@ -1,6 +1,18 @@
 import db from '.';
 
 
+export const addMonsterAttackTag = async (name: string, description: string) => {
+  try {
+    const res = await db.query(
+      'INSERT INTO monster_attack_tags (name, description) VALUES ($1, $2) RETURNING *',
+      [name, description]
+    );
+    return res.rows[0];
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 export const getMonsterAttackTags = async () => {
   try {
     const res = await db.query('SELECT * FROM monster_attack_tags');

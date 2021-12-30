@@ -5,19 +5,19 @@ import {
   GraphQLNonNull,
   GraphQLList
 } from 'graphql';
-import { getMonsterAttackTagsByMonsterId } from '../database/monsterAttackTags';
+import { getMonsterAttackTagsByMonsterId } from '../../database/monsterAttackTags';
 import {
   getMonstersByMonsterAttackTagId,
   getMonstersByMonsterQualityId,
   getMonstersByMonsterTagId
-} from '../database/monster';
-import { getMonsterActionsByMonsterId } from '../database/monsterActions';
-import { getMonsterQualitiesByMonsterId } from '../database/monsterQualities';
+} from '../../database/monster';
+import { getMonsterActionsByMonsterId } from '../../database/monsterActions';
+import { getMonsterQualitiesByMonsterId } from '../../database/monsterQualities';
 import {
   getSettingById,
   getMonstersBySettingId
-} from '../database/monsterSetting';
-import { getMonsterTagsByMonsterId } from '../database/monsterTag';
+} from '../../database/monsterSetting';
+import { getMonsterTagsByMonsterId } from '../../database/monsterTag';
 
 export const MonsterType: GraphQLObjectType = new GraphQLObjectType({
   name: 'Monster',
@@ -82,10 +82,9 @@ export const MonsterType: GraphQLObjectType = new GraphQLObjectType({
     setting: {
       type: MonsterSettingType,
       description: 'the monster\'s setting.',
-      resolve: async parent => await getSettingById(parent.id)
+      resolve: async parent => await getSettingById(parent.setting_id)
     }
-  }),
-  isTypeOf: val => val.name && val.id
+  })
 });
 
 

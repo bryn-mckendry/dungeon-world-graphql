@@ -107,9 +107,50 @@ export const updateMonster = async (monster: {
   qualities?: string[],
   description?: string,
   instinct?: string,
-  actions?: string[]
+  actions?: string[],
+  setting?: string
 }) => {
   try {
+    // Validate that the monster tags provided already exist.
+    let tags;
+    if (monster.tags) {
+      tags = (await db.query(
+        `SELECT * FROM monster_tags WHERE LOWER(name) IN (${monster.tags.map((_, i) => `$${i+1}`)})`,
+        monster.tags.map(val => val.toLowerCase())
+      )).rows;
+      for (let t of monster.tags) {
+        if (!tags.map(val => val.name.toLowerCase()).includes(t.toLowerCase())) {
+          return { message: `Monster tag '${t}' does not exist.` }
+        }
+      }
+    }
+
+    // Validate that the monster attack tags provided already exist.
+    let attackTags;
+    if (monster.attackTags) {
+      attackTags = (await db.query(
+        `SELECT * FROM monster_attack_tags WHERE LOWER(name) IN (${monster.attackTags.map((_, i) => `$${i+1}`)})`,
+        monster.attackTags.map(val => val.toLowerCase())
+      )).rows;
+      for (let t of monster.attackTags) {
+        if (!attackTags.map(val => val.name.toLowerCase().includes(t.toLowerCase()))) {
+          return { message: `Monster attack tag '${t}' does not exist.`}
+        }
+      }
+    }
+
+    if (monster.setting) {
+      // Validate that the monster setting provided already exists.
+      let res = await db.query('SELECT * FROM monster_settings WHERE LOWER(name) = $1', [monster.setting.toLowerCase()]);
+      if (res.rowCount === 0) {
+        return { message: `Monster settings '${monster.setting}' does not exist.`}
+      }
+      // Update monster setting
+      await db.query('UPDATE monsters SET setting_id = $1 WHERE id = $2', [res.rows[0].id, monster.id]);
+    }
+
+
+    // Update the monster rows
     let res = await db.query (`
       UPDATE monsters SET
         name = COALESCE($1, name),
@@ -133,7 +174,91 @@ export const updateMonster = async (monster: {
     ]);
     let updatedMonster = res.rows[0];
 
-    // TODO: implement reference updates.
+    if (!updatedMonster) return { message: `Monster with id ${monster.id} does not exist.` }
+
+    // Update monster tags
+    if (tags) {
+      // Delete any tags not in the provided array.
+      await db.query(`
+        DELETE FROM
+          monsters_monster_tags
+        WHERE
+            monster_id = $1
+        AND monster_tag_id NOT IN (${tags.map((_, i) => `$${i+2}`).join(',')})
+      `, [monster.id, ...tags.map(val => val.id)]);
+
+      res = await db.query(`
+        SELECT
+          *
+        FROM monsters_monster_tags
+        WHERE
+            monster_id = $1
+        AND monster_tag_id IN (${tags.map((_, i) => `$${i+2}`).join(',')})
+      `, [monster.id, ...tags.map(val => val.id)]);
+
+      tags = tags.filter(tag => !res.rows.map(val => val.id).includes(tag.id));
+
+      res = await db.query(`
+        INSERT INTO
+          monsters_monster_tags
+          (monster_id, monster_tag_id)
+        VALUES
+        ${tags.map((_, i) => `($${i+1}, $${i+2})`).join(',')}
+      `, tags.map(val => `${monster.id},${val.id}`).join(',').split(','));
+    }
+
+
+    // Update monster attack tags
+    if (attackTags) {
+      await db.query(`
+        DELETE FROM
+          monsters_monster_attack_tags
+        WHERE
+            monster_id = $1
+        AND monster_attack_tag_id NOT IN (${attackTags.map((_, i) => `$${i+2}`).join(',')})
+      `, [monster.id, ...attackTags.map(val => val.id)])
+
+      res = await db.query(`
+        SELECT
+          *
+        FROM monsters_monster_attack_tags
+        WHERE
+            monster_id = $1
+        AND monster_attack_tag_id IN (${attackTags.map((_, i) => `$${i+2}`).join(',')})
+      `, [monster.id, ...attackTags.map(val => val.id)])
+
+      res = await db.query(`
+        INSERT INTO
+          monsters_monster_attack_tags
+          (monster_id, monster_attack_tag_id)
+        VALUES
+        ${attackTags.map((_, i) => `($${i+1}, $${i+2})`).join(',')}
+      `, attackTags.map(val => `${monster.id},${val.id}`).join(',').split(','))
+    }
+
+    // Update monster qualities
+    if (monster.qualities) {
+      await db.query('DELETE FROM monster_qualities WHERE monster_id = $1', [monster.id]);
+      await db.query(`
+        INSERT INTO
+          monster_qualities
+          (monster_id, name)
+        VALUES
+        ${monster.qualities.map((_, i) => `($${i+1}, $${i+2})`).join(',')}
+      `, monster.qualities.map(val => `${monster.id},${val}`).join(',').split(','))
+    }
+
+    // Update monster actions
+    if (monster.actions) {
+      await db.query('DELETE FROM monster_actions WHERE monster_id = $1', [monster.id]);
+      await db.query(`
+        INSERT INTO
+          monster_actions
+          (monster_id, name)
+        VALUES
+        ${monster.actions.map((_, i) => `($${i+1}, $${i+2})`).join(',')}
+      `, monster.actions.map(val => `${monster.id},${val}`).join(',').split(','))
+    }
 
     return updatedMonster;
   } catch (e) {
