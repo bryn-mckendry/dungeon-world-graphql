@@ -14,7 +14,7 @@ import {
 } from '../../database/monster';
 import { getMonsterActionsByMonsterId } from '../../database/monsterActions';
 import { getMonsterQualitiesByMonsterId } from '../../database/monsterQualities';
-import { getSettingById } from '../../database/monsterSetting';
+import { getMonsterSettingById } from '../../database/monsterSetting';
 import { getMonsterTagsByMonsterId } from '../../database/monsterTag';
 
 export const MonsterType: GraphQLObjectType = new GraphQLObjectType({
@@ -80,7 +80,7 @@ export const MonsterType: GraphQLObjectType = new GraphQLObjectType({
     setting: {
       type: MonsterSettingType,
       description: 'the monster\'s setting.',
-      resolve: async parent => await getSettingById(parent.setting_id)
+      resolve: async parent => await getMonsterSettingById(parent.setting_id)
     }
   })
 });

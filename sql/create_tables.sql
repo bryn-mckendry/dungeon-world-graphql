@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS monsters (
   armor         INT,
   description   TEXT,
   instinct      VARCHAR(50),
-  setting_id    INT REFERENCES monster_settings
+  setting_id    INT REFERENCES monster_settings ON UPDATE CASCADE ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS monster_actions (

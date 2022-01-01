@@ -13,9 +13,22 @@ import {
  } from '../database/monster';
 import { MonsterQueryResultType } from './types';
 import { validateToken } from '../auth';
-import { MonsterAttackTagQueryResultType, MonsterTagQueryResultType } from './types/resultTypes';
-import { addMonsterAttackTag, removeMonsterAttackTagById, updateMonsterAttackTag } from '../database/monsterAttackTags';
-import { addMonsterTag, removeMonsterTagById, updateMonsterTag } from '../database/monsterTag';
+import {
+  MonsterAttackTagQueryResultType,
+  MonsterSettingQueryResultType,
+  MonsterTagQueryResultType
+} from './types/resultTypes';
+import {
+  addMonsterAttackTag,
+  removeMonsterAttackTagById,
+  updateMonsterAttackTag
+} from '../database/monsterAttackTags';
+import {
+  addMonsterTag,
+  removeMonsterTagById,
+  updateMonsterTag
+} from '../database/monsterTag';
+import { addMonsterSetting, removeMonsterSettingById, updateMonsterSetting } from '../database/monsterSetting';
 
 
 const validateRequest = async (token: string, callback: Function) => {
@@ -152,6 +165,42 @@ export const RootMutationType = new GraphQLObjectType({
       resolve: async (_, args, context) => await validateRequest(
         context.headers.token,
         async () => await updateMonsterTag(args)
+      )
+    },
+    removeMonsterSetting: {
+      type: MonsterSettingQueryResultType,
+      description: 'Remove an existing monster setting.',
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLInt) }
+      },
+      resolve: async (_, { id }, context) => await validateRequest(
+        context.headers.token,
+        async () => await removeMonsterSettingById(id)
+      )
+    },
+    addMonsterSetting: {
+      type: MonsterSettingQueryResultType,
+      description: 'Add a new monster setting.',
+      args: {
+        name: { type: new GraphQLNonNull(GraphQLString) },
+        description: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (_, args, context) => await validateRequest(
+        context.headers.token,
+        async () => await addMonsterSetting(args)
+      )
+    },
+    updateMonsterSetting: {
+      type: MonsterSettingQueryResultType,
+      description: 'Update an existing monster setting.',
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLInt) },
+        name: { type: GraphQLString },
+        description: { type: GraphQLString }
+      },
+      resolve: async (_, args, context) => await validateRequest(
+        context.headers.token,
+        async () => await updateMonsterSetting(args)
       )
     }
   })

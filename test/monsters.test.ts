@@ -56,8 +56,12 @@ describe('Monsters API', () => {
 
   test('monster should return results by id.', async () => {
     const { body } = await mockRequest('{ monster(id: 1) { id } }');
-    expect(body.data).toEqual({
-      monster: { id: 1 }
+    expect(body).toEqual({
+      data: {
+        monster: {
+          id: 1
+        }
+      }
     })
   });
 
@@ -79,10 +83,12 @@ describe('Monsters API', () => {
         }
       }
     `, true);
-    expect(body.data).toEqual({
-      removeMonster: {
-        __typename: 'Monster',
-        id: 1
+    expect(body).toEqual({
+      data: {
+        removeMonster: {
+          __typename: 'Monster',
+          id: 1
+        }
       }
     });
 
@@ -105,17 +111,23 @@ describe('Monsters API', () => {
             }
           }
         `, 'bad-token');
-    expect(body.data).toEqual({
-      removeMonster: {
-        __typename: 'ApiError',
-        status: 401,
-        message: 'Unauthorized access.'
+    expect(body).toEqual({
+      data: {
+        removeMonster: {
+          __typename: 'ApiError',
+          status: 401,
+          message: 'Unauthorized access.'
+        }
       }
     })
 
     const check = await mockRequest('{ monster(id: 2) { id } }');
-    expect(check.body.data).toEqual({
-      monster: { id: 2 }
+    expect(check.body).toEqual({
+      data: {
+        monster: {
+          id: 2
+        }
+      }
     });
   });
 
@@ -134,11 +146,13 @@ describe('Monsters API', () => {
         }
       }
     `, true);
-    expect(body.data).toEqual({
-      removeMonster: {
-        __typename: 'ApiError',
-        status: 404,
-        message: `Monster with id '1' does not exist.`
+    expect(body).toEqual({
+      data: {
+        removeMonster: {
+          __typename: 'ApiError',
+          status: 404,
+          message: `Monster with id '1' does not exist.`
+        }
       }
     })
   });
@@ -160,10 +174,12 @@ describe('Monsters API', () => {
         }
       }
     }`, true);
-    expect(body.data).toEqual({
-      addMonster: {
-        __typename: 'Monster',
-        name: 'Test'
+    expect(body).toEqual({
+      data: {
+        addMonster: {
+          __typename: 'Monster',
+          name: 'Test'
+        }
       }
     })
   });
@@ -183,11 +199,13 @@ describe('Monsters API', () => {
           }
         }
       `, 'bad-token');
-    expect(body.data).toEqual({
-      addMonster: {
-        __typename: 'ApiError',
-        status: 401,
-        message: 'Unauthorized access.'
+    expect(body).toEqual({
+      data: {
+        addMonster: {
+          __typename: 'ApiError',
+          status: 401,
+          message: 'Unauthorized access.'
+        }
       }
     });
   });
@@ -245,22 +263,24 @@ describe('Monsters API', () => {
           }
         }
       `, true);
-      expect(body.data).toEqual({
-        updateMonster: {
-          __typename: 'Monster',
-          id: 3,
-          name: 'Test name',
-          tags: [{ name: 'Divine' }],
-          attack: 'Test attack',
-          damage: 'Test dmg',
-          hp: 5,
-          armor: 10,
-          attackTags: [{ name: 'Far' }],
-          qualities: [{ name: 'Test quality' }],
-          description: 'Test description',
-          instinct: 'To test',
-          actions: [{ name: 'Test action' }],
-          setting: { name: 'The Dark Woods' }
+      expect(body).toEqual({
+        data: {
+          updateMonster: {
+            __typename: 'Monster',
+            id: 3,
+            name: 'Test name',
+            tags: [{ name: 'Divine' }],
+            attack: 'Test attack',
+            damage: 'Test dmg',
+            hp: 5,
+            armor: 10,
+            attackTags: [{ name: 'Far' }],
+            qualities: [{ name: 'Test quality' }],
+            description: 'Test description',
+            instinct: 'To test',
+            actions: [{ name: 'Test action' }],
+            setting: { name: 'The Dark Woods' }
+          }
         }
       });
   });
@@ -280,11 +300,13 @@ describe('Monsters API', () => {
             }
           }
         `, 'bad-token');
-    expect(body.data).toEqual({
-      updateMonster: {
-        __typename: 'ApiError',
-        status: 401,
-        message: 'Unauthorized access.'
+    expect(body).toEqual({
+      data: {
+        updateMonster: {
+          __typename: 'ApiError',
+          status: 401,
+          message: 'Unauthorized access.'
+        }
       }
     });
   });
@@ -304,11 +326,13 @@ describe('Monsters API', () => {
         }
       }
     `, true);
-    expect(body.data).toEqual({
-      updateMonster: {
-        __typename: 'ApiError',
-        status: 404,
-        message: `Monster tag 'Bad Tag' does not exist.`
+    expect(body).toEqual({
+      data: {
+        updateMonster: {
+          __typename: 'ApiError',
+          status: 404,
+          message: `Monster tag 'Bad Tag' does not exist.`
+        }
       }
     });
   });
@@ -331,11 +355,13 @@ describe('Monsters API', () => {
         }
       }
     `, true);
-    expect(body.data).toEqual({
-      updateMonster: {
-        __typename: 'ApiError',
-        status: 404,
-        message: `Monster attack tag 'Bad Tag' does not exist.`
+    expect(body).toEqual({
+      data: {
+        updateMonster: {
+          __typename: 'ApiError',
+          status: 404,
+          message: `Monster attack tag 'Bad Tag' does not exist.`
+        }
       }
     });
   });
@@ -355,11 +381,13 @@ describe('Monsters API', () => {
         }
       }
     `, true);
-    expect(body.data).toEqual({
-      updateMonster: {
-        __typename: 'ApiError',
-        status: 404,
-        message: `Monster setting 'Bad Setting' does not exist.`
+    expect(body).toEqual({
+      data: {
+        updateMonster: {
+          __typename: 'ApiError',
+          status: 404,
+          message: `Monster setting 'Bad Setting' does not exist.`
+        }
       }
     });
   });
