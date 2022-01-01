@@ -56,6 +56,9 @@ export const RootQueryType = new GraphQLObjectType({
     monsterTag: {
       type: MonsterTagType,
       description: 'A specific monster tag.',
+      args: {
+        id: { type: GraphQLInt }
+      },
       resolve: async (_, { id }) => await getMonsterTagById(id)
     },
     monsterTags: {

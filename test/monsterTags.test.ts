@@ -1,42 +1,43 @@
 import { mockRequest } from './utils';
 
 
-describe('Monster Attack Tags API', () => { 
+describe('Monster Tags API', () => { 
   /* ------------------------------ GET TESTS -------------------------------- */
 
-  test('monsterAttackTags should return all attack tags.', async () => {
+  test('monsterTags should return all tags.', async () => {
     const { body } = await mockRequest(`
       {
-        monsterAttackTags {
+        monsterTags {
           id,
           name,
           description
         }
       }
     `)
-    for (let tag of body.data.monsterAttackTags) {
+    for (let tag of body.data.monsterTags) {
       expect(tag).toHaveProperty('id');
       expect(tag).toHaveProperty('name');
       expect(tag).toHaveProperty('description');
     }
   });
 
-  test('monsterAttackTag should return a single attack tag by id.', async () => {
+  test('monsterTag should return a single tag by id.', async () => {
     const { body } = await mockRequest(`
           {
-            monsterAttackTag(id: 1) {
+            monsterTag(id: 1) {
               id,
               name,
               description
             }
           }
         `);
+    
     expect(body).toEqual({
       data: {
-        monsterAttackTag: {
+        monsterTag: {
           id: 1,
-          name: 'Close',
-          description: 'It\'s useful for attacking something at arm\'s reach plus a foot or two.'
+          name: 'Amorphous',
+          description: 'Its anatomy and organs are bizarre and unnatural.'
         }
       }
     });
@@ -44,12 +45,12 @@ describe('Monster Attack Tags API', () => {
 
   /* ------------------------------ DELETE TESTS ------------------------------ */
   
-  test('removeMonsterAttackTag mutation should remove the attack tag from the database.', async () => {
+  test('removeMonsterTag mutation should remove the tag from the database.', async () => {
     const { body } = await mockRequest(`
       mutation {
-        removeMonsterAttackTag(id: 1) {
+        removeMonsterTag(id: 1) {
           __typename
-          ... on MonsterAttackTag {
+          ... on MonsterTag {
             id
           }
           ... on ApiError {
@@ -60,20 +61,20 @@ describe('Monster Attack Tags API', () => {
     `, true);
     expect(body).toEqual({
       data: {
-        removeMonsterAttackTag: {
-          __typename: 'MonsterAttackTag',
+        removeMonsterTag: {
+          __typename: 'MonsterTag',
           id: 1
         }
       }
-    });
+    })
   });
 
-  test('removeMonsterAttackTag mutation should return an unauthorized message if token is not valid.', async () => {
+  test('removeMonsterTag mutation should return an unauthorized message if token is not valid.', async () => {
     const { body } = await mockRequest(`
       mutation {
-        removeMonsterAttackTag(id: 2) {
+        removeMonsterTag(id: 2) {
           __typename
-          ... on MonsterAttackTag {
+          ... on MonsterTag {
             id
           }
           ... on ApiError {
@@ -85,7 +86,7 @@ describe('Monster Attack Tags API', () => {
     `, 'bad-token');
     expect(body).toEqual({
       data: {
-        removeMonsterAttackTag: {
+        removeMonsterTag: {
           __typename: 'ApiError',
           status: 401,
           message: 'Unauthorized access.'
@@ -94,12 +95,12 @@ describe('Monster Attack Tags API', () => {
     })
   });
 
-  test('removeMonsterAttackTag mutation should return a not found message if attack tag does not exist.', async () => {
+  test('removeMonsterTag mutation should return a not found message if tag does not exist.', async () => {
     const { body } = await mockRequest(`
       mutation {
-        removeMonsterAttackTag(id: 999) {
+        removeMonsterTag(id: 999) {
           __typename
-          ... on MonsterAttackTag {
+          ... on MonsterTag {
             id
           }
           ... on ApiError {
@@ -111,7 +112,7 @@ describe('Monster Attack Tags API', () => {
     `, true);
     expect(body).toEqual({
       data: {
-        removeMonsterAttackTag: {
+        removeMonsterTag: {
           __typename: 'ApiError',
           status: 404,
           message: 'Resource not found.'
@@ -123,12 +124,12 @@ describe('Monster Attack Tags API', () => {
     
   /* ------------------------------ INSERT TESTS ------------------------------ */
   
-  test('addMonsterAttackTag mutation should add a new monster to the database.', async () => {
+  test('addMonsterTag mutation should add a new monster to the database.', async () => {
     const { body } = await mockRequest(`
       mutation {
-        addMonsterAttackTag(name: "Test attack tag", description: "Test description") {
+        addMonsterTag(name: "Test tag", description: "Test description") {
           __typename
-          ... on MonsterAttackTag {
+          ... on MonsterTag {
             name,
             description
           }
@@ -141,21 +142,21 @@ describe('Monster Attack Tags API', () => {
     `, true);
     expect(body).toEqual({
       data: {
-        addMonsterAttackTag: {
-          __typename: 'MonsterAttackTag',
-          name: 'Test attack tag',
+        addMonsterTag: {
+          __typename: 'MonsterTag',
+          name: 'Test tag',
           description: 'Test description'
         }
       }
     });
   });
 
-  test('addMonsterAttackTag mutation should return an unauthorized message if token is not valid.', async () => {
+  test('addMonsterTag mutation should return an unauthorized message if token is not valid.', async () => {
     const { body } = await mockRequest(`
       mutation {
-        addMonsterAttackTag(name: "Bad attack tag request") {
+        addMonsterTag(name: "Bad tag request", description: "descrip") {
           __typename
-          ... on MonsterAttackTag {
+          ... on MonsterTag {
             name
           }
           ... on ApiError {
@@ -167,7 +168,7 @@ describe('Monster Attack Tags API', () => {
     `);
     expect(body).toEqual({
       data: {
-        addMonsterAttackTag: {
+        addMonsterTag: {
           __typename: 'ApiError',
           status: 401,
           message: 'Unauthorized access.'
@@ -177,16 +178,16 @@ describe('Monster Attack Tags API', () => {
   });
 
   /* ------------------------------ UPDATE TESTS ------------------------------ */
-  test('updateMonsterAttackTag mutation should update the tag data.', async () => {
+  test('updateMonsterTag mutation should update the tag data.', async () => {
     const { body } = await mockRequest(`
       mutation {
-        updateMonsterAttackTag(
+        updateMonsterTag(
           id: 2,
-          name: "Updated attack tag",
+          name: "Updated tag",
           description: "Updated description"
         ) {
           __typename
-          ... on MonsterAttackTag {
+          ... on MonsterTag {
             id,
             name,
             description
@@ -200,25 +201,25 @@ describe('Monster Attack Tags API', () => {
     `, true);
     expect(body).toEqual({
       data: {
-        updateMonsterAttackTag: {
-          __typename: 'MonsterAttackTag',
+        updateMonsterTag: {
+          __typename: 'MonsterTag',
           id: 2,
-          name: 'Updated attack tag',
+          name: 'Updated tag',
           description: 'Updated description'
         }
       }
     });
   });
 
-  test('updateMonsterAttackTag mutation should return an unauthorized message if token is not valid.', async () => {
+  test('updateMonsterTag mutation should return an unauthorized message if token is not valid.', async () => {
     const { body } = await mockRequest(`
       mutation {
-        updateMonsterAttackTag(
+        updateMonsterTag(
           id: 3,
           name: "Bad request"
         ) {
           __typename
-          ... on MonsterAttackTag {
+          ... on MonsterTag {
             id
           }
           ... on ApiError {
@@ -230,7 +231,7 @@ describe('Monster Attack Tags API', () => {
     `);
     expect(body).toEqual({
       data: {
-        updateMonsterAttackTag: {
+        updateMonsterTag: {
           __typename: 'ApiError',
           status: 401,
           message: 'Unauthorized access.'
@@ -239,15 +240,15 @@ describe('Monster Attack Tags API', () => {
     })
   });
 
-  test('updateMonsterAttackTag mutation should return a not found message if monster does not exist.', async () => {
+  test('updateMonsterTag mutation should return a not found message if monster does not exist.', async () => {
     const { body } = await mockRequest(`
       mutation {
-        updateMonsterAttackTag(
+        updateMonsterTag(
           id: 999,
           name: "Bad Request"
         ) {
           __typename
-          ... on MonsterAttackTag {
+          ... on MonsterTag {
             id
           }
           ... on ApiError {
@@ -259,7 +260,7 @@ describe('Monster Attack Tags API', () => {
     `, true);
     expect(body).toEqual({
       data: {
-        updateMonsterAttackTag: {
+        updateMonsterTag: {
           __typename: 'ApiError',
           status: 404,
           message: 'Resource not found.'

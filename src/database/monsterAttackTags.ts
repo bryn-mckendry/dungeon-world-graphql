@@ -1,4 +1,5 @@
 import db from '.';
+import { ErrorMessages } from './constants';
 import {
   MonsterDetailQueryResult,
   MonsterDetailResponse,
@@ -16,7 +17,7 @@ export const addMonsterAttackTag = async (monsterAttackTag: { name: string, desc
     return res.rows[0];
   } catch (e) {
     console.log(e);
-    return { status: 400, message: 'Bad request.' }
+    return ErrorMessages.BAD_REQUEST;
   }
 }
 
@@ -26,7 +27,7 @@ export const getMonsterAttackTags = async (): MonsterDetailArrayResponse => {
     return res.rows;
   } catch (e) {
     console.log(e);
-    return { status: 400, message: 'Bad request.' }
+    return ErrorMessages.BAD_REQUEST;
   }
 }
 
@@ -36,7 +37,7 @@ export const getMonsterAttackTagById = async (id: number): MonsterDetailResponse
     return res.rows[0];
   } catch (e) {
     console.log(e);
-    return { status: 400, message: 'Bad request.' }
+    return ErrorMessages.BAD_REQUEST;
   }
 }
 
@@ -57,7 +58,7 @@ export const getMonsterAttackTagsByMonsterId = async (id: number): MonsterDetail
     return res.rows;
   } catch (e) {
     console.log(e);
-    return { status: 400, message: 'Bad request.' }
+    return ErrorMessages.BAD_REQUEST;
   }
 }
 
@@ -69,10 +70,10 @@ export const removeMonsterAttackTagById = async (id: number): MonsterDetailRespo
         id = $1
       RETURNING *;
     `, [id]);
-    return res.rowCount > 0 ? res.rows[0] : { status: 404, message: `Monster attack tag with id '${id}' does not exist.` }
+    return res.rowCount > 0 ? res.rows[0] : ErrorMessages.NOT_FOUND;
   } catch (e) {
     console.log(e);
-    return { status: 400, message: 'Bad request.' }
+    return ErrorMessages.BAD_REQUEST;
   }
 }
 
@@ -80,14 +81,14 @@ export const updateMonsterAttackTag = async(monsterAttackTag: { id: number, name
   try {
     const res: MonsterDetailQueryResult = await db.query(`
       UPDATE monster_attack_tags SET
-        name = $1,
-        description = $2
+        name = COALESCE($1, name),
+        description = COALESCE($2, description)
       WHERE id = $3
       RETURNING *;
     `, [monsterAttackTag.name, monsterAttackTag.description, monsterAttackTag.id]);
-    return res.rowCount > 0 ? res.rows[0] : { status: 404, message: `Monster attack tag with id '${monsterAttackTag.id}' does not exist.`}
+    return res.rowCount > 0 ? res.rows[0] : ErrorMessages.NOT_FOUND;
   } catch (e) {
     console.log(e);
-    return { status: 400, message: 'Bad request.' }
+    return ErrorMessages.BAD_REQUEST;
   }
 }

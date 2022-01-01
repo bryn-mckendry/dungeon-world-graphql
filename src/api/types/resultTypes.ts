@@ -1,5 +1,5 @@
 import { GraphQLUnionType } from 'graphql';
-import { MonsterAttackTagType } from '.';
+import { MonsterAttackTagType, MonsterTagType } from '.';
 import { ApiErrorType } from './errorType';
 import { MonsterType } from './monsterType';
 
@@ -16,3 +16,10 @@ export const MonsterAttackTagQueryResultType: GraphQLUnionType = new GraphQLUnio
   types: [ApiErrorType, MonsterAttackTagType],
   resolveType: val => val.id ? 'MonsterAttackTag' : 'ApiError'
 });
+
+export const MonsterTagQueryResultType: GraphQLUnionType = new GraphQLUnionType({
+  name: 'MonsterTagQueryResult',
+  description: 'Resulting data from querying Monster Tag resources.',
+  types: [ApiErrorType, MonsterTagType],
+  resolveType: val => val.id ? 'MonsterTag' : 'ApiError'
+})
