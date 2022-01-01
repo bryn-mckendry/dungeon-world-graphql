@@ -1,30 +1,13 @@
-import { QueryResult } from 'pg';
 import db from '.';
+import {
+  MonsterResponse,
+  MonsterArrayResponse,
+  Monster,
+  MonsterQueryResult
+} from './database.type';
 
 
-interface Monster {
-  id?: number,
-  name?: string,
-  tags?: string[],
-  attack?: string,
-  damage?: string,
-  hp?: number,
-  armor?: number,
-  attackTags?: string[],
-  qualities?: string[],
-  description?: string,
-  instinct?: string,
-  actions?: string[],
-  setting?: string
-}
-
-interface Error {
-  status: number,
-  message: string
-}
-
-
-export const addMonster = async (monster: Monster): Promise<Monster | Error> => {
+export const addMonster = async (monster: Monster): MonsterResponse => {
   try {
     let { name, attack, damage, hp, armor, description, instinct } = monster;
     let res = await db.query(`
@@ -99,7 +82,7 @@ export const addMonster = async (monster: Monster): Promise<Monster | Error> => 
   }
 }
 
-export const removeMonster = async (id: number): Promise<Monster | Error> => {
+export const removeMonsterById = async (id: number): MonsterResponse => {
   try {
     const res = await db.query('DELETE FROM monsters WHERE id = $1 RETURNING *', [id]);
     if (res.rowCount === 0) {
@@ -112,7 +95,7 @@ export const removeMonster = async (id: number): Promise<Monster | Error> => {
   }
 }
 
-export const updateMonster = async (monster: Monster): Promise<Monster | Error> => {
+export const updateMonster = async (monster: Monster): MonsterResponse => {
   try {
     // Validate that the monster tags provided already exist.
     let tags;
@@ -154,7 +137,7 @@ export const updateMonster = async (monster: Monster): Promise<Monster | Error> 
 
 
     // Update the monster rows
-    let res: QueryResult<Monster> = await db.query (`
+    let res: MonsterQueryResult = await db.query (`
       UPDATE monsters SET
         name = COALESCE($1, name),
         attack = COALESCE($2, attack),
@@ -270,9 +253,9 @@ export const updateMonster = async (monster: Monster): Promise<Monster | Error> 
   }
 }
 
-export const getMonsters = async (): Promise<Monster[] | Error> => {
+export const getMonsters = async (): MonsterArrayResponse => {
   try {
-    const res: QueryResult<Monster>  = await db.query('SELECT * FROM monsters');
+    const res: MonsterQueryResult  = await db.query('SELECT * FROM monsters');
     return res.rows;
   } catch (e) {
     console.log(e);
@@ -280,9 +263,19 @@ export const getMonsters = async (): Promise<Monster[] | Error> => {
   }
 }
 
-export const getMonsterById = async (id: number): Promise<Monster | Error> => {
+export const getMonsterById = async (id: number): MonsterResponse => {
   try {
-    const res: QueryResult<Monster>  = await db.query('SELECT * FROM monsters WHERE id = $1', [id])
+    const res: MonsterQueryResult  = await db.query('SELECT * FROM monsters WHERE id = $1', [id])
+    return res.rowCount === 0 ? { status: 404, message: `Monster with id '${id}' does not exist.` } : res.rows[0];
+  } catch (e) {
+    console.log(e);
+    return { status: 400, message: 'Bad request.' }
+  }
+}
+
+export const getMonsterByName = async (name: string): MonsterResponse => {
+  try {
+    const res: MonsterQueryResult  = await db.query('SELECT * FROM monsters WHERE LOWER(name) = $1', [name]);
     return res.rows[0];
   } catch (e) {
     console.log(e);
@@ -290,19 +283,9 @@ export const getMonsterById = async (id: number): Promise<Monster | Error> => {
   }
 }
 
-export const getMonsterByName = async (name: string): Promise<Monster | Error> => {
+export const getMonstersByMonsterAttackTagId = async (id: number): MonsterArrayResponse => {
   try {
-    const res: QueryResult<Monster>  = await db.query('SELECT * FROM monsters WHERE LOWER(name) = $1', [name]);
-    return res.rows[0];
-  } catch (e) {
-    console.log(e);
-    return { status: 400, message: 'Bad request.' }
-  }
-}
-
-export const getMonstersByMonsterAttackTagId = async (id: number): Promise<Monster[] | Error> => {
-  try {
-    const res: QueryResult<Monster> = await db.query(`
+    const res: MonsterQueryResult = await db.query(`
       SELECT
         m.*
       FROM monsters AS m
@@ -320,9 +303,9 @@ export const getMonstersByMonsterAttackTagId = async (id: number): Promise<Monst
   }
 }
 
-export const getMonstersByMonsterQualityId = async (id: number): Promise<Monster[] | Error> => {
+export const getMonstersByMonsterQualityId = async (id: number): MonsterArrayResponse => {
   try {
-    const res: QueryResult<Monster> = await db.query(`
+    const res: MonsterQueryResult = await db.query(`
       SELECT
         m.*
       FROM monsters as m
@@ -340,9 +323,9 @@ export const getMonstersByMonsterQualityId = async (id: number): Promise<Monster
   }
 }
 
-export const getMonstersByMonsterTagId = async (id: number): Promise<Monster[] | Error> => {
+export const getMonstersByMonsterTagId = async (id: number): MonsterArrayResponse => {
   try {
-    const res: QueryResult<Monster> = await db.query(`
+    const res: MonsterQueryResult = await db.query(`
       SELECT
         m.*
       FROM monster_tags AS mt
@@ -360,6 +343,17 @@ export const getMonstersByMonsterTagId = async (id: number): Promise<Monster[] |
   } catch (e) {
     console.log(e);
     return { status: 400, message: 'Bad request' }
+  }
+}
+
+
+export const getMonstersBySettingId = async (id: number): MonsterArrayResponse => {
+  try {
+    const res = await db.query('SELECT * FROM monsters WHERE setting_id = $1', [id]);
+    return res.rows;
+  } catch (e) {
+    console.log(e);
+    return { status: 400, message: 'Bad request.' }
   }
 }
 

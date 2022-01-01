@@ -8,13 +8,13 @@ import {
 } from 'graphql';
 import {
   addMonster,
-  removeMonster,
+  removeMonsterById,
   updateMonster,
  } from '../database/monster';
-import {
-  MonsterMutationResultType
-} from './types';
+import { MonsterQueryResultType } from './types';
 import { validateToken } from '../auth';
+import { MonsterAttackTagQueryResultType } from './types/resultTypes';
+import { addMonsterAttackTag, removeMonsterAttackTagById, updateMonsterAttackTag } from '../database/monsterAttackTags';
 
 
 const validateRequest = async (token: string, callback: Function) => {
@@ -27,7 +27,7 @@ export const RootMutationType = new GraphQLObjectType({
   description: 'root mutation.',
   fields: () => ({
     addMonster: {
-      type: MonsterMutationResultType,
+      type: MonsterQueryResultType,
       description: 'Add a monster.',
       args: {
         name: { type: new GraphQLNonNull(GraphQLString) },
@@ -48,18 +48,18 @@ export const RootMutationType = new GraphQLObjectType({
       )
     },
     removeMonster: {
-      type: MonsterMutationResultType,
+      type: MonsterQueryResultType,
       description: 'Remove a monster.',
       args: { 
         id: { type: GraphQLInt }
       },
       resolve: async (_, { id }, context) => await validateRequest(
         context.headers.token,
-        async () => await removeMonster(id)
+        async () => await removeMonsterById(id)
       )
     },
     updateMonster: {
-      type: MonsterMutationResultType,
+      type: MonsterQueryResultType,
       description: 'Update a monster.',
       args: {
         id: { type: new GraphQLNonNull(GraphQLInt) },
@@ -79,6 +79,42 @@ export const RootMutationType = new GraphQLObjectType({
       resolve: async (_, args, context) => await validateRequest(
         context.headers.token,
         async () => await updateMonster(args)
+      )
+    },
+    removeMonsterAttackTag: {
+      type: MonsterAttackTagQueryResultType,
+      description: 'Remove a monster attack tag.',
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLInt) }
+      },
+      resolve: async (_, { id }, context) => await validateRequest(
+        context.headers.token,
+        async () => await removeMonsterAttackTagById(id)
+      )
+    },
+    updateMonsterAttackTag: {
+      type: MonsterAttackTagQueryResultType,
+      description: 'Update an existing monster attack tag.',
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLInt) },
+        name: { type: GraphQLString },
+        description: { type: GraphQLString }
+      },
+      resolve: async (_, args, context) => await validateRequest(
+        context.headers.token,
+        async () => await updateMonsterAttackTag(args)
+      )
+    },
+    addMonsterAttackTag: {
+      type: MonsterAttackTagQueryResultType,
+      description: 'Add a new monster attack tag.',
+      args: {
+        name: { type: new GraphQLNonNull(GraphQLString) },
+        description: { type: GraphQLString }
+      },
+      resolve: async(_, args, context) => await validateRequest(
+        context.headers.token,
+        async () => await addMonsterAttackTag(args)
       )
     }
   })

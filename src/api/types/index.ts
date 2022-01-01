@@ -9,4 +9,4 @@ export {
   MonsterQualityType,
   MonsterSettingType
 } from './monsterType';
-export { MonsterMutationResultType } from './resultTypes';
+export { MonsterQueryResultType } from './resultTypes';

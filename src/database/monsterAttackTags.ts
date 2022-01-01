@@ -1,39 +1,48 @@
 import db from '.';
+import {
+  MonsterDetailQueryResult,
+  MonsterDetailResponse,
+  MonsterDetailArrayResponse
+} from './database.type';
 
 
-export const addMonsterAttackTag = async (name: string, description: string) => {
+export const addMonsterAttackTag = async (monsterAttackTag: { name: string, description: string }): MonsterDetailResponse => {
   try {
-    const res = await db.query(
+    let { name, description } = monsterAttackTag;
+    const res: MonsterDetailQueryResult = await db.query(
       'INSERT INTO monster_attack_tags (name, description) VALUES ($1, $2) RETURNING *',
       [name, description]
     );
     return res.rows[0];
   } catch (e) {
     console.log(e);
+    return { status: 400, message: 'Bad request.' }
   }
 }
 
-export const getMonsterAttackTags = async () => {
+export const getMonsterAttackTags = async (): MonsterDetailArrayResponse => {
   try {
-    const res = await db.query('SELECT * FROM monster_attack_tags');
+    const res: MonsterDetailQueryResult = await db.query('SELECT * FROM monster_attack_tags');
     return res.rows;
   } catch (e) {
     console.log(e);
+    return { status: 400, message: 'Bad request.' }
   }
 }
 
-export const getMonsterAttackTagById = async (id: number) => {
+export const getMonsterAttackTagById = async (id: number): MonsterDetailResponse => {
   try {
-    const res = await db.query('SELECT * FROM monster_attack_tags WHERE id = $1', [id]);
+    const res: MonsterDetailQueryResult = await db.query('SELECT * FROM monster_attack_tags WHERE id = $1', [id]);
     return res.rows[0];
   } catch (e) {
     console.log(e);
+    return { status: 400, message: 'Bad request.' }
   }
 }
 
-export const getMonsterAttackTagsByMonsterId = async (id: number) => {
+export const getMonsterAttackTagsByMonsterId = async (id: number): MonsterDetailArrayResponse => {
   try {
-    const res = await db.query(`
+    const res: MonsterDetailQueryResult = await db.query(`
       SELECT
         mt.id,
         mt.name
@@ -48,5 +57,37 @@ export const getMonsterAttackTagsByMonsterId = async (id: number) => {
     return res.rows;
   } catch (e) {
     console.log(e);
+    return { status: 400, message: 'Bad request.' }
+  }
+}
+
+export const removeMonsterAttackTagById = async (id: number): MonsterDetailResponse => {
+  try {
+    const res: MonsterDetailQueryResult = await db.query(`
+      DELETE FROM monster_attack_tags
+      WHERE
+        id = $1
+      RETURNING *;
+    `, [id]);
+    return res.rowCount > 0 ? res.rows[0] : { status: 404, message: `Monster attack tag with id '${id}' does not exist.` }
+  } catch (e) {
+    console.log(e);
+    return { status: 400, message: 'Bad request.' }
+  }
+}
+
+export const updateMonsterAttackTag = async(monsterAttackTag: { id: number, name?: string, description?: string }): MonsterDetailResponse => {
+  try {
+    const res: MonsterDetailQueryResult = await db.query(`
+      UPDATE monster_attack_tags SET
+        name = $1,
+        description = $2
+      WHERE id = $3
+      RETURNING *;
+    `, [monsterAttackTag.name, monsterAttackTag.description, monsterAttackTag.id]);
+    return res.rowCount > 0 ? res.rows[0] : { status: 404, message: `Monster attack tag with id '${monsterAttackTag.id}' does not exist.`}
+  } catch (e) {
+    console.log(e);
+    return { status: 400, message: 'Bad request.' }
   }
 }

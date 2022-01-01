@@ -1,7 +1,8 @@
 import db from '.';
+import { RequestError } from './database.type';
 
 
-export const getMonsterActionsByMonsterId = async (id: number) => {
+export const getMonsterActionsByMonsterId = async (id: number): Promise<{ id: number; name: string }[] | RequestError> => {
   try {
     const res = await db.query(`
       SELECT
@@ -15,5 +16,6 @@ export const getMonsterActionsByMonsterId = async (id: number) => {
     return res.rows;
   } catch (e) {
     console.log(e);
+    return { status: 400, message: 'Bad request.' }
   }
 }

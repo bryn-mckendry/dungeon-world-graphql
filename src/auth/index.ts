@@ -12,7 +12,6 @@ export const login = async (username: string, password: string): Promise<{ token
     }
     return { token: jwt.sign({ username }, process.env.TOKEN_SECRET!, { expiresIn: '1h' }) };
   } catch (e) {
-    console.log(e);
     return { token: null };
   }
 }
@@ -22,7 +21,6 @@ export const validateToken = async (token: string) => {
     const auth = jwt.verify(token, process.env.TOKEN_SECRET!);
     if (auth) return true;
   } catch (e) {
-    console.log(e);
     return false;
   }
 }

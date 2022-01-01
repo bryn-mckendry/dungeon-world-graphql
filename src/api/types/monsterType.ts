@@ -9,14 +9,12 @@ import { getMonsterAttackTagsByMonsterId } from '../../database/monsterAttackTag
 import {
   getMonstersByMonsterAttackTagId,
   getMonstersByMonsterQualityId,
-  getMonstersByMonsterTagId
+  getMonstersByMonsterTagId,
+  getMonstersBySettingId
 } from '../../database/monster';
 import { getMonsterActionsByMonsterId } from '../../database/monsterActions';
 import { getMonsterQualitiesByMonsterId } from '../../database/monsterQualities';
-import {
-  getSettingById,
-  getMonstersBySettingId
-} from '../../database/monsterSetting';
+import { getSettingById } from '../../database/monsterSetting';
 import { getMonsterTagsByMonsterId } from '../../database/monsterTag';
 
 export const MonsterType: GraphQLObjectType = new GraphQLObjectType({
