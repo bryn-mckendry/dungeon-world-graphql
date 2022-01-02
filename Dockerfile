@@ -38,7 +38,7 @@ ENV PGUSER=postgres
 ENV PGHOST=db
 ENV PGPASSWORD=password
 ENV PGPORT=5432
-ENV PGDATABASE=prod
+ENV PGDATABASE=production
 ENV TOKEN_SECRET=secret-prod
 
 RUN yarn build

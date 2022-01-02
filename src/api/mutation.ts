@@ -29,10 +29,11 @@ import {
   updateMonsterTag
 } from '../database/monsterTag';
 import { addMonsterSetting, removeMonsterSettingById, updateMonsterSetting } from '../database/monsterSetting';
+import { ErrorMessages } from '../database/constants';
 
 
 const validateRequest = async (token: string, callback: Function) => {
-  return await validateToken(token) ? await callback() : { status: 401, message: 'Unauthorized access.' }
+  return await validateToken(token) ? await callback() : ErrorMessages.UNAUTHORIZED;
 }
 
 
